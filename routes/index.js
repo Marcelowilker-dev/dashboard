@@ -23,8 +23,22 @@ app.use('/', router);
       
           res.json({ total_vagas: totalVagas });
         } catch (error) {
-          console.error('Erro ao listar senhas:', error);
-          res.status(500).json({ message: 'Erro ao listar senhas' });
+          console.error('Erro ao consultar vagas', error);
+          res.status(500).json({ message: 'Erro ao consultar vagas' });
         }
       });
+      router.get('/estatisticas', async (req, res) => {
+        try {
+          const query = 'SELECT no_curso,SUM(qt_ing) AS alunos, SUM(qt_ing_masc) AS masc,SUM(qt_ing_fem) AS fem, (SUM(qt_ing_masc) * 100 / SUM(qt_ing)) AS percentual_masculino, (SUM(qt_ing_fem) * 100 / SUM(qt_ing)) AS percentual_feminino FROM cursos GROUP BY no_curso';
+          const result = await client.query(query);
+      
+          // Certifique-se de que result.rows seja um array (se a consulta retornar vários registros)
+          const porcentagens = result.rows;
+      
+          res.json({ porcentagens: porcentagens });
+        } catch (error) {
+          console.error('Erro ao listar porcentagens dos cursos:', error);
+          res.status(500).json({ message: 'Erro ao listar porcentagens dos cursos' });
+        }
+      })
       module.exports = router;
