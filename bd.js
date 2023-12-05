@@ -1,8 +1,12 @@
-const { Client } = require('pg');
+const { Pool } = require('pg');
 
-const client = new Client({
+const pool = new Pool({
   connectionString: 'postgresql://postgres:2334*4EDdFCb4gCD-ebG411GC2-bCE1G@monorail.proxy.rlwy.net:23351/railway',
-  
+
 });
-client.connect();
-module.exports = client;
+
+process.on('exit', () => {
+  pool.end();
+});
+
+module.exports = pool;
