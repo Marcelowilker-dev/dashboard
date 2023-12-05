@@ -35,13 +35,15 @@ router.get('/estatisticas/:anoCenso', async (req, res) => {
    ;
   let query;
   let result;
-    if (censo ==='1') {
-       query = 'SELECT nu_ano_censo, co_curso, no_curso, SUM(qt_ing) AS alunos, SUM(qt_ing_masc) AS masc, SUM(qt_ing_fem) AS fem, (SUM(qt_ing_masc) * 100.0 / SUM(qt_ing)) AS percentual_masculino,(SUM(qt_ing_fem) * 100.0 / SUM(qt_ing)) AS percentual_feminino FROM cursos  GROUP BY nu_ano_censo, co_curso, no_curso';
-       result = await pool.query(query);
-    } else {
-       query = 'SELECT nu_ano_censo, co_curso, no_curso, SUM(qt_ing) AS alunos, SUM(qt_ing_masc) AS masc, SUM(qt_ing_fem) AS fem, (SUM(qt_ing_masc) * 100.0 / SUM(qt_ing)) AS percentual_masculino,(SUM(qt_ing_fem) * 100.0 / SUM(qt_ing)) AS percentual_feminino FROM cursos  where nu_ano_censo =$1 GROUP BY nu_ano_censo, co_curso, no_curso';
-        result = await pool.query(query, [censo]);
-      }
+   
+  if (censo ==='1') {
+    query = 'SELECT nu_ano_censo, co_curso, no_curso, SUM(qt_ing) AS alunos, SUM(qt_ing_masc) AS masc, SUM(qt_ing_fem) AS fem, (SUM(qt_ing_masc) * 100.0 / SUM(qt_ing)) AS percentual_masculino, (SUM(qt_ing_fem) * 100.0 / SUM(qt_ing)) AS percentual_feminino, MAX(qt_ing_vestibular) AS qt_ing_vestibular, MAX(qt_ing_enem) AS qt_ing_enem, SUM(qt_ing_avaliacao_seriada) + SUM(qt_ing_egr) AS OUTRAS_FORMAS_ING FROM cursos GROUP BY nu_ano_censo, co_curso, no_curso';
+    
+    result = await pool.query(query);
+ }else {
+    query = 'SELECT nu_ano_censo, co_curso, no_curso, SUM(qt_ing) AS alunos, SUM(qt_ing_masc) AS masc, SUM(qt_ing_fem) AS fem, (SUM(qt_ing_masc) * 100.0 / SUM(qt_ing)) AS percentual_masculino,(SUM(qt_ing_fem) * 100.0 / SUM(qt_ing)) AS percentual_feminino, MAX(qt_ing_vestibular) AS qt_ing_vestibular, MAX(qt_ing_enem) AS qt_ing_enem, SUM(qt_ing_avaliacao_seriada) + SUM(qt_ing_egr) AS OUTRAS_FORMAS_ING FROM cursos  where nu_ano_censo =$1 GROUP BY nu_ano_censo, co_curso, no_curso';
+     result = await pool.query(query, [censo]);
+   }
    
 
 
