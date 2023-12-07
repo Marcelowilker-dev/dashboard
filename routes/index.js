@@ -7,18 +7,27 @@ app.use(express.json());
 app.use('/', router);
 
 
-router.get('/vagasCursos/:co_curso', async (req, res) => {
+router.get('/vagasCursos/:co_curso/:nu_ano_censo', async (req, res) => {
   try {
     const co_curso = req.params.co_curso;
+    const nu_ano_censo = req.params.nu_ano_censo;
 
+    let query;
+    let result;
 
     if (isNaN(co_curso)) {
       return res.status(400).json({ error: 'co_curso deve ser um número válido' });
+    }else if (nu_ano_censo ==='1' ){
+      query = 'SELECT SUM(qt_vg_total) AS total_vagas FROM cursos WHERE co_curso = $1';
+      result = await pool.query(query, [co_curso]);
+
+    }else {
+      query = 'SELECT SUM(qt_vg_total) AS total_vagas FROM cursos WHERE co_curso = $1 AND nu_ano_censo = $2' ;
+       result = await pool.query(query,[co_curso, nu_ano_censo]);
     }
 
 
-    const query = 'SELECT SUM(qt_vg_total) AS total_vagas FROM cursos WHERE co_curso = $1';
-    const result = await pool.query(query, [co_curso]);
+    
     const totalVagas = result.rows[0].total_vagas;
 
     res.json({ total_vagas: totalVagas });
