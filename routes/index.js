@@ -3,11 +3,30 @@ const app = express();
 const router = express.Router();
 const pool = require('../bd');
 app.use(express.json());
-
+const jwt = require('jsonwebtoken');
 app.use('/', router);
 
+function verificarToken(req, res, next) {
 
-router.get('/vagasCursos/:co_curso/:nu_ano_censo', async (req, res) => {
+  const token = req.header('Authorization');
+
+  if (!token) {
+    return res.status(401).json({ message: 'Token não fornecido' });
+  }
+
+  try {
+
+    const decoded = jwt.verify(token, 'MinhaChaveTesteAgoraVai');
+
+    req.userId = decoded.userId;
+
+    next();
+  } catch (error) {
+    return res.status(401).json({ message: 'Token inválido' });
+  }
+}
+
+router.get('/vagasCursos/:co_curso/:nu_ano_censo', verificarToken, async (req, res) => {
   try {
     const co_curso = req.params.co_curso;
     const nu_ano_censo = req.params.nu_ano_censo;
@@ -37,16 +56,40 @@ router.get('/vagasCursos/:co_curso/:nu_ano_censo', async (req, res) => {
   }
 });
 // esta rota retorna todos os dados estatisticos se for passado como argumento o valor '1'
-//tambem retornará os dados dos respectivos anos do censo se for passado o valor do ano em questao.
-router.get('/estatisticas/:anoCenso', async (req, res) => {
+//tambem retornará os dados dos  anos do censo se for passado o valor do ano em questao.
+router.get('/estatisticas/:anoCenso', verificarToken, async (req, res) => {
   try {
     const censo = req.params.anoCenso;
-    
+
     let query;
     let result;
 
     if (censo === '1') {
-      query = 'SELECT nu_ano_censo, co_curso, no_curso, SUM(qt_ing) AS alunos, SUM(qt_ing_masc) AS masc, SUM(qt_ing_fem) AS fem, sum(qt_ing_branca) AS ing_branca, SUM(qt_ing_preta) as ing_preta, sum(qt_ing_parda) as ing_parda, sum(qt_ing_amarela) as ing_amarela, sum(qt_ing_indigena) as ing_indigena, sum(qt_ing_cornd) as ing_cornd,(SUM(qt_ing_branca) * 100.0 / SUM(qt_ing)) AS percentual_ing_branca, (SUM(qt_ing_preta) * 100.0 / SUM(qt_ing)) AS percentual_ing_preta, (SUM(qt_ing_parda) * 100.0 / SUM(qt_ing)) AS percentual_ing_parda, (SUM(qt_ing_amarela) * 100.0 / SUM(qt_ing)) AS percentual_ing_amarela, (SUM(qt_ing_indigena) * 100.0 / SUM(qt_ing)) AS percentual_ing_indigena, (SUM(qt_ing_cornd) * 100.0 / SUM(qt_ing)) AS percentual_ing_cornd,  (SUM(qt_ing_masc) * 100.0 / SUM(qt_ing)) AS percentual_masculino,(SUM(qt_ing_fem) * 100.0 / SUM(qt_ing)) AS percentual_feminino, MAX(qt_ing_vestibular) AS qt_ing_vestibular, MAX(qt_ing_enem) AS qt_ing_enem, SUM(qt_ing_avaliacao_seriada) + SUM(qt_ing_egr) AS OUTRAS_FORMAS_ING FROM cursos   GROUP BY nu_ano_censo, co_curso, no_curso';
+      query = `
+      SELECT
+       nu_ano_censo,
+       co_curso,
+       no_curso, 
+       SUM(qt_ing) AS alunos,
+       SUM(qt_ing_masc) AS masc,
+       SUM(qt_ing_fem) AS fem,
+       sum(qt_ing_branca) AS ing_branca,
+       SUM(qt_ing_preta) as ing_preta,
+       sum(qt_ing_parda) as ing_parda, 
+       sum(qt_ing_amarela) as ing_amarela,
+       sum(qt_ing_indigena) as ing_indigena,
+       sum(qt_ing_cornd) as ing_cornd,
+       (SUM(qt_ing_branca) * 100.0 / SUM(qt_ing)) AS percentual_ing_branca,
+       (SUM(qt_ing_preta) * 100.0 / SUM(qt_ing)) AS percentual_ing_preta,
+       (SUM(qt_ing_parda) * 100.0 / SUM(qt_ing)) AS percentual_ing_parda,
+       (SUM(qt_ing_amarela) * 100.0 / SUM(qt_ing)) AS percentual_ing_amarela,
+       (SUM(qt_ing_indigena) * 100.0 / SUM(qt_ing)) AS percentual_ing_indigena,
+       (SUM(qt_ing_cornd) * 100.0 / SUM(qt_ing)) AS percentual_ing_cornd,
+       (SUM(qt_ing_masc) * 100.0 / SUM(qt_ing)) AS percentual_masculino,
+       (SUM(qt_ing_fem) * 100.0 / SUM(qt_ing)) AS percentual_feminino,
+       MAX(qt_ing_vestibular) AS qt_ing_vestibular, MAX(qt_ing_enem) AS qt_ing_enem,
+       SUM(qt_ing_avaliacao_seriada) + SUM(qt_ing_egr) AS OUTRAS_FORMAS_ING 
+      FROM cursos   GROUP BY nu_ano_censo, co_curso, no_curso`;
 
       result = await pool.query(query);
     } else {
@@ -79,8 +122,6 @@ router.get('/estatisticas/:anoCenso', async (req, res) => {
     `;
       result = await pool.query(query, [censo]);
     }
-
-
 
     const porcentagens = result.rows;
 

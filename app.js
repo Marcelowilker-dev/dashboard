@@ -6,11 +6,13 @@ const port = 3000;
 const app = express();
 
 const indexRouter = require("./routes/index");
+const usuarioRouter = require("./routes/usuario");
 
 app.use(cors())
 app.use(bodyParser.json());
 app.use(express.json());
 app.use("/", indexRouter);
+app.use("/usuario", usuarioRouter);
 
 app.listen(port, () => {
   console.log(`Servidor rodando na porta ${port}`);
