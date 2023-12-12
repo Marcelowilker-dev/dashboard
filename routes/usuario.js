@@ -50,13 +50,15 @@ router.post('/login', async (req, res) => {
         const userResult = await pool.query('SELECT id, email, senha FROM usuario WHERE email = $1', [email]);
         const user = userResult.rows[0];
 
-        // Verifica se o usuario existe
+        // Verifica se o usuário existe
         if (!user) {
-            return res.json({ message: 'Credenciais inválidas' });
+            return res.status(401).json({ message: 'Credenciais inválidas' });
         }
 
         // Verifica a senha usando bcrypt
-        if (await bcrypt.compare(senha, user.senha)) {
+        const senhaCorreta = await bcrypt.compare(senha, user.senha);
+
+        if (senhaCorreta) {
             const { id: userId } = user;
 
             // Gera o token com o ID do usuário
@@ -64,12 +66,12 @@ router.post('/login', async (req, res) => {
 
             res.json({ message: 'Login realizado com sucesso', token });
         } else {
-            res.json({ message: 'Credenciais inválidas' });
+            return res.status(401).json({ message: 'Credenciais inválidas' });
         }
 
     } catch (error) {
         console.error('Erro ao verificar credenciais:', error);
-        res.status(500).json({ message: 'Erro ao verificar credenciais' });
+        return res.status(500).json({ message: 'Erro ao verificar credenciais' });
     }
 });
 
