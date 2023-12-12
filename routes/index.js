@@ -52,7 +52,7 @@ router.get('/vagasCursos/:co_curso/:nu_ano_censo', verificarToken, async (req, r
 
     res.json({ total_vagas: totalVagas });
   } catch (error) {
-    console.error('Erro ao consultar vagas', error);
+    
     res.status(500).json({ message: 'Erro ao consultar vagas' });
   }
 });
@@ -134,7 +134,7 @@ router.get('/estatisticas/:anoCenso', verificarToken, async (req, res) => {
 
     res.json({ porcentagens: porcentagens });
   } catch (error) {
-    console.error('Erro ao listar porcentagens dos cursos:', error);
+
     res.status(500).json({ message: 'Erro ao listar porcentagens dos cursos' });
   }
 })
