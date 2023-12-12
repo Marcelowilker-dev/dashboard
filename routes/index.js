@@ -26,8 +26,8 @@ function verificarToken(req, res, next) {
   }
 }
 
-//router.get('/vagasCursos/:co_curso/:nu_ano_censo', verificarToken, async (req, res) => {
-router.get('/vagasCursos/:co_curso/:nu_ano_censo', async (req, res) => {
+router.get('/vagasCursos/:co_curso/:nu_ano_censo', verificarToken, async (req, res) => {
+
   try {
     const co_curso = req.params.co_curso;
     const nu_ano_censo = req.params.nu_ano_censo;
@@ -58,8 +58,8 @@ router.get('/vagasCursos/:co_curso/:nu_ano_censo', async (req, res) => {
 });
 // esta rota retorna todos os dados estatisticos se for passado como argumento o valor '1'
 //tambem retornará os dados dos  anos do censo se for passado o valor do ano em questao.
-//router.get('/estatisticas/:anoCenso', verificarToken, async (req, res) => {
-router.get('/estatisticas/:anoCenso', async (req, res) => {
+router.get('/estatisticas/:anoCenso', verificarToken, async (req, res) => {
+
   try {
     const censo = req.params.anoCenso;
 
