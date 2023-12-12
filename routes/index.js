@@ -90,6 +90,7 @@ function verificarToken(req, res, next) {
        (SUM(qt_ing_masc) * 100.0 / SUM(qt_ing)) AS percentual_masculino,
        (SUM(qt_ing_fem) * 100.0 / SUM(qt_ing)) AS percentual_feminino,
        MAX(qt_ing_vestibular) AS qt_ing_vestibular, MAX(qt_ing_enem) AS qt_ing_enem,
+       MAX(qt_ing_vg_prog_especial) AS qt_ing_vg_prog_especial,
        SUM(qt_ing_avaliacao_seriada) + SUM(qt_ing_egr) AS OUTRAS_FORMAS_ING 
       FROM cursos   GROUP BY nu_ano_censo, co_curso, no_curso`;
 
@@ -118,7 +119,7 @@ function verificarToken(req, res, next) {
         ROUND((SUM(qt_ing_masc) * 100.0 / NULLIF(SUM(qt_ing), 0)), 2) AS percentual_masculino,
         ROUND((SUM(qt_ing_fem) * 100.0 / NULLIF(SUM(qt_ing), 0)), 2) AS percentual_feminino,
         MAX(qt_ing_vestibular) AS qt_ing_vestibular,
-        MAX(qt_ing_enem) AS qt_ing_enem,
+        MAX(qt_ing_enem) AS qt_ing_enem, MAX(qt_ing_vg_prog_especial) AS qt_ing_vg_prog_especial,
         SUM(qt_ing_avaliacao_seriada) + SUM(qt_ing_egr) AS OUTRAS_FORMAS_ING
       FROM cursos where nu_ano_censo = $1 GROUP BY nu_ano_censo, co_curso, no_curso
     `;
