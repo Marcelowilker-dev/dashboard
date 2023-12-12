@@ -74,22 +74,4 @@ router.post('/login', async (req, res) => {
 });
 
 
-
-
-
-router.delete('/excluirSenha', async (req, res) => {
-    // const token = req.headers.authorization;
-    //  const decodedToken = jwt.verify(token, secretKey);
-    // const userId = decodedToken.userId;
-
-
-    try {
-        await pool.query('DELETE FROM senhas WHERE id = $1', [userId]);
-        res.json({ message: 'Senha excluída com sucesso' });
-    } catch (error) {
-        console.error('Erro ao excluir senha:', error);
-        res.status(500).json({ message: 'Erro ao excluir senha' });
-    }
-});
-
 module.exports = router;
